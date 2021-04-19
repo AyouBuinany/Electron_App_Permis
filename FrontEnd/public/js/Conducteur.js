@@ -2,8 +2,8 @@
 
 let Register = document.getElementById('save');
 
-   Register &&  Register.addEventListener('click', (e) => {
-    e.preventDefault();
+   Register &&  Register.addEventListener('click', () => {
+   
     let matricule = document.getElementById('matricule').value;
         let firstName = document.getElementById('firstName').value;
         let lastName = document.getElementById('lastName').value;
@@ -31,7 +31,7 @@ console.log({data})
 
         axios.post('http://localhost:4000/api/register',data)
             .then(function (response) {
-    console.log(response);
+            
                 const myNotification = new Notification('Notification', {
                     body: 'Register successfully'
                 })
@@ -59,6 +59,7 @@ console.log(token)
     axios.post('http://localhost:4000/api/confirmer',{'token':token})
     .then(function (response) {
         console.log(response);
+
                     const myNotification = new Notification('Notification', {
                         body: 'Confirmer successfully'
                     })
@@ -92,11 +93,12 @@ let data = {
 console.log(data)
     axios.post('http://localhost:4000/api/login',data)
     .then(function (response) {
-        console.log(response);
+        let getData= response.data;
+        localStorage.setItem('auth-token', JSON.stringify(getData));
                     const myNotification = new Notification('Notification', {
                         body: 'login Conducteur successfully'
                     })
-                   window.location.href="HomeConducteur.html";
+                  window.location.href="HomeConducteur.html";
         
                 })
                 .catch(function (err) {
@@ -107,13 +109,49 @@ console.log(data)
                     alert(err.response.data.error.errors)
                 });
 
+})
 
-    // if(user == "ayoub" && password =="ayoub"){
+//get Formation conducteur From token 
+function getToken() {
+    let rowConducteur = document.getElementById('row');
 
-    //   window.location.href="Category.html";
+    if(localStorage.getItem("auth-token")){
+let auth= JSON.parse(localStorage.getItem("auth-token"));
+let {conducteur_id}=auth.conducteur_token;
+
+         axios.get(`http://localhost:4000/api/findConducteur/${conducteur_id}`)
+         .then(function (response) {
+        let element =  response.data.conducteur ||  {}
+                 rowConducteur.innerHTML += `<tr><td>
+                 <span class="custom-checkbox">
+                     <input type="checkbox" id="checkbox1" name="options[]" value="1">
+                     <label for="checkbox1"></label>
+                 </span>
+             </td>
+             <td>${element.firstName}</td>
+             <td>${element.lastName}</td>
+             <td>${element.email}</td>
+             <td>${element.adress}</td>
+            <td>${element.phone}</td>
+             <td>${element.license_number}</td>
+             <td style='color:red'>${element.numberPoints}</td>
+     </tr>`
+               
+          
+            
+        }).catch(function (err) {
+            console.log(err);
+        });
+        
+
+    }
     
-    // }
-    // else{
-    //   alert("Username or Password invalid !!!!!!!!!!");
-    //  }
+}
+
+let logout = document.getElementById('logout');
+logout && logout.addEventListener('click',()=>{
+    if(localStorage.getItem('auth-token')){
+        localStorage.clear();
+        logout.setAttribute('href',"loginConducteur.html")
+    }
 })

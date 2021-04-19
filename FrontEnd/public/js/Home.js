@@ -22,7 +22,7 @@ $(document).ready(function(){
 	});
 });
 
-// --------------get category from db---------------- 
+// --------------get conducteur from db---------------- 
 
 let rowConducteur = document.getElementById('row');
 
